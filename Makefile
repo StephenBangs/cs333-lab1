@@ -38,3 +38,7 @@ tar:
 	rm -f $(TAR_FILE)
 	tar cvfa $(TAR_FILE) ?akefile *.[ch]
 	tar tvaf $(TAR_FILE)
+
+git lazy:
+	git add *.[ch] ?akefile
+	git commit -m "lazy make git commit"
