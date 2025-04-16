@@ -5,6 +5,7 @@
 #Also cleans, and tars files using make clean and make tar commands
 
 #adding line for test credential commit
+#second line for git test creds
 DEBUG = -g3 -O0
 
 CFLAGS = -Wall -Wshadow -Wunreachable-code -Wredundant-decls -Wmissing-declarations -Wold-style-definition -Wmissing-prototypes -Wdeclaration-after-statement -Wextra -Werror -Wpedantic -Wno-return-local-addr -Wunsafe-loop-optimizations -Wuninitialized $(DEBUG)
