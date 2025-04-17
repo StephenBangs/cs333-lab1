@@ -14,6 +14,8 @@
 
 #define OPTIONS "k:"
 
+
+//Source: Jesse Chaney Vid Assign 2
 #ifndef FALSE
 # define FALSE 0
 #endif // FALSE
@@ -40,12 +42,6 @@ int main(int argc, char *argv[]) {
 				break;
 		}
 	}
-
-	//TODO
-	argc = 0;
-	argc++;
-	argv = NULL;
-	argv++;
 
 	return EXIT_SUCCESS;
 

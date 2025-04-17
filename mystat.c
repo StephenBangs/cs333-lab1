@@ -11,6 +11,8 @@
 #include <unistd.h>
 #include <string.h>
 
+
+//Source: Jesse Chaney Vid Assign 2
 #ifndef FALSE
 # define FALSE 0
 #endif // FALSE
@@ -27,14 +29,9 @@
 int main(int argc, char *argv[]) {
 
 	for(int i = 1; i < argc; i++) {
-		printf("\nArg %d: %s", i, argv[i]);
+		printf("Arg %d: %s\n", i, argv[i]);
 	}
 
-	//TODO
-	argc = 0;
-	argc++;
-	argv = NULL;
-	argv++;
 
 	return EXIT_SUCCESS;
 
