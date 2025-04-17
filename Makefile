@@ -29,7 +29,7 @@ $(TARGETS): $(COBJS)
 	$(CC) $(@).o -o $(@)
 
 clean:
-	rm -f $(COBJS) $(TARGETS) *~
+	rm -f $(COBJS) $(TARGETS) *~ *.txt
 
 LAB = 01
 TAR_FILE = stbangs_Lab$(LAB).tar.gz
