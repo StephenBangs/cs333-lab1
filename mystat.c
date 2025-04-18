@@ -19,12 +19,22 @@
 
 void print_permissions(mode_t mode);
 void print_time(const char *label, time_t time);
-
+void print_file_info(const char *filename);
+const char * file_type_string(mode_t mode);
 
 int main(int argc, char *argv[]) {
 
 	for(int i = 1; i < argc; i++) {
 		printf("Arg %d: %s\n", i, argv[i]);
+	}
+
+	if(argc < 2) {
+		fprintf(stderr, "Usage: %s file1 [file2 ...]\n", argv[0]);
+		return EXIT_FAILURE;
+	}
+	
+	for(int i - 1; i < argc; i++) {
+		print_file_info(argv[i]);
 	}
 
 	return EXIT_SUCCESS;
@@ -74,5 +84,23 @@ void print_time(const char *label, time_t t) {
 	printf("  %s:    %ld (seconds since the epoch)\n", label, t);
 	printf("  %s:    %s (local)\n", label, local_buf);
 	printf("  %s:    %s (GMT)\n", label, gmt_buf);
+
+}
+
+
+void print_file_info(const char *filename) {
+
+}
+
+const char * file_type_string(mode_t mode) {
+
+	if (S_ISREG(mode)) return "regular file";
+	if (S_ISDIR(mode)) return "regular file";
+	if (S_ISLINK(mode)) return "regular file";
+	if (S_ISCHR(mode)) return "regular file";
+	if (S_ISBLK(mode)) return "regular file";
+	if (S_ISFIFO(mode)) return "regular file";
+	if (S_ISSOCK(mode)) return "regular file";
+	return "unknown";
 
 }
