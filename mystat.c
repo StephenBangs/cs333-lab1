@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
 
 //printing file permissions
 void print_permissions(mode_t mode) {
-	char perms[11] = "---------";
+	char perms[11] = "----------";
 
 	//file types display
 	if(S_ISDIR(mode)) perms[0] = 'd';	
@@ -86,7 +86,7 @@ void print_permissions(mode_t mode) {
 	if(mode & S_IXOTH) perms[9] = 'x';
 	
 	//print em all up
-	printf("  Mode:                     %s        (%o in octal)\n", perms, mode & 0777);
+	printf("  Mode:                     %s        (%03o in octal)\n", perms, mode & 0777);
 }
 
 //prints time in various types based on time_type
@@ -147,11 +147,14 @@ void print_file_info(const char *filename) {
 		len = readlink(filename, link_target, sizeof(link_target) -1);
 		if (len != -1) {
 			link_target[len] = '\0';
-			printf(" -> %s", link_target);
 
 			if (stat(filename, &target_stat) == -1) {
 				printf(" - with dangling destination");
 			}
+			else {
+				printf(" -> %s", link_target);
+			}
+
 		}
 		else {
 			printf(" -unreadable symlink");
@@ -183,7 +186,6 @@ void print_file_info(const char *filename) {
 	print_time("Last file access:", sb.st_atime, sb.st_atime, 2);
 	print_time("Last file modification:", sb.st_mtime, sb.st_mtime, 2);
 	print_time("Last status change:", sb.st_ctime, sb.st_ctime, 2);
-	printf("\n");
 
 }
 
