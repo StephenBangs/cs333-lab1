@@ -101,17 +101,17 @@ void print_time(const char *label, time_t t, time_t tlocal, int time_type) {
 
 	switch(time_type) {
 		case 0:
-			printf("  %-26s: %ld (seconds since the epoch)\n", label, t);
+			printf("  %-25s %ld (seconds since the epoch)\n", label, t);
 			break;
 		case 1:
 			local = localtime(&tlocal);
 			strftime(local_buf, sizeof(local_buf), "%Y-%m-%d %H:%M:%S %z (%Z) %a", local);
-			printf("  %s:       %s (local)\n", label, local_buf);
+			printf("  %-25s %s (local)\n", label, local_buf);
 			break;
 		case 2:
 			gmt = gmtime(&t);
 			strftime(gmt_buf, sizeof(gmt_buf), "%Y-%m-%d %H:%M:%S %z (%Z) %a", gmt);
-			printf("  %s:       %s (GMT)\n", label, gmt_buf);
+			printf("  %-25s %s (GMT)\n", label, gmt_buf);
 			break;
 		default:
 			fprintf(stderr, "Error: no case for print_time\n");
@@ -172,17 +172,17 @@ void print_file_info(const char *filename) {
 	printf("  File size:                %ld bytes\n", (long) sb.st_size);
 	printf("  Blocks allocated:         %ld\n", (long) sb.st_blocks);
 
-	print_time("Last file access", sb.st_atime, sb.st_atime, 0);
-	print_time("Last file modification", sb.st_mtime, sb.st_mtime, 0);
-	print_time("Last status change", sb.st_ctime, sb.st_ctime, 0);
+	print_time("Last file access:", sb.st_atime, sb.st_atime, 0);
+	print_time("Last file modification:", sb.st_mtime, sb.st_mtime, 0);
+	print_time("Last status change:", sb.st_ctime, sb.st_ctime, 0);
 
-	print_time("Last file access", sb.st_atime, sb.st_atime, 1);
-	print_time("Last file modification", sb.st_mtime, sb.st_mtime, 1);
-	print_time("Last status change", sb.st_ctime, sb.st_ctime, 1);
+	print_time("Last file access:", sb.st_atime, sb.st_atime, 1);
+	print_time("Last file modification:", sb.st_mtime, sb.st_mtime, 1);
+	print_time("Last status change:", sb.st_ctime, sb.st_ctime, 1);
 
-	print_time("Last file access", sb.st_atime, sb.st_atime, 2);
-	print_time("Last file modification", sb.st_mtime, sb.st_mtime, 2);
-	print_time("Last status change", sb.st_ctime, sb.st_ctime, 2);
+	print_time("Last file access:", sb.st_atime, sb.st_atime, 2);
+	print_time("Last file modification:", sb.st_mtime, sb.st_mtime, 2);
+	print_time("Last status change:", sb.st_ctime, sb.st_ctime, 2);
 	printf("\n");
 
 }
