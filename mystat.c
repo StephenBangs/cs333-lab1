@@ -1,10 +1,11 @@
-
 //Stephen Bangs
 //4/16/25
 //CS333 - Jesse Chaney
 //Lab 1 - Caesar Cipher, XOR Cipher, mystat()
 
-//This is the mystat c code.
+//This is the mystat c code. Prints mostly the same thing as 
+//given example code. Whitespace might be different, but luckily that diff -w flag 
+//is coming through very kindly for us.
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,24 +17,33 @@
 #include <grp.h>
 #include <time.h>
 #include <errno.h>
+#include <limits.h>
 
+//fn prototypes
+//handles permissions
 void print_permissions(mode_t mode);
+//handles time (hopefully)
 void print_time(const char *label, time_t time);
+//returns file type char
+const char *file_type_string(mode_t mode);
+//handles printing file info
 void print_file_info(const char *filename);
-const char * file_type_string(mode_t mode);
 
 int main(int argc, char *argv[]) {
-
+	
+	//TODO - remove
 	for(int i = 1; i < argc; i++) {
-		printf("Arg %d: %s\n", i, argv[i]);
+		fprintf(stderr, "Arg %d: %s\n", i, argv[i]);
 	}
-
+	
+	//print error message if no filename given
 	if(argc < 2) {
 		fprintf(stderr, "Usage: %s file1 [file2 ...]\n", argv[0]);
 		return EXIT_FAILURE;
 	}
 	
-	for(int i - 1; i < argc; i++) {
+	//print file info for each argument sequentially
+	for(int i = 1; i < argc; i++) {
 		print_file_info(argv[i]);
 	}
 
@@ -67,9 +77,11 @@ void print_permissions(mode_t mode) {
 	if(mode & S_IROTH) perms[7] = 'r';
 	if(mode & S_IWOTH) perms[8] = 'w';
 	if(mode & S_IXOTH) perms[9] = 'x';
-
+	
+	//print em all up
 	printf("  Mode:                 %s       (%o in octal)\n", perms, mode & 0777);
 }
+
 
 void print_time(const char *label, time_t t) {
 	char local_buf[64];
@@ -89,10 +101,12 @@ void print_time(const char *label, time_t t) {
 
 
 void print_file_info(const char *filename) {
-
+	
+	struct stat sb;
+	char link_target[
 }
 
-const char * file_type_string(mode_t mode) {
+const char *file_type_string(mode_t mode) {
 
 	if (S_ISREG(mode)) return "regular file";
 	if (S_ISDIR(mode)) return "regular file";

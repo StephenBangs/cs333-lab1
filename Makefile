@@ -2,7 +2,8 @@
 #Lab 1 Makefile - UNIX std I/O, Strings, and stat() 
 #4/16/25
 #Makes Caesar Cipher, XOR cipher, and mystat programs from caesar.c, xor.c, and mystat.c source files.
-#Also cleans, and tars files using make clean and make tar commands
+#Also cleans, and tars files using make clean and make tar commands.
+#added a git lazy command for source control, though I mostly still commit manually.
 
 DEBUG = -g3 -O0
 
