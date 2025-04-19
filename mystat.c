@@ -103,18 +103,69 @@ void print_time(const char *label, time_t t) {
 void print_file_info(const char *filename) {
 	
 	struct stat sb;
-	char link_target[
+	char link_target[PATH_MAX];
+	ssize_t len;
+
+	const char *ftype;
+	struct passwd *pw;
+	struct group *gr;
+	struct stat target_stat;
+
+	if(lstat(filename, &sb) == -1) {
+		perror(filename);
+		return;
+	}
+
+	printf("File: %s\n", filename);
+
+	ftype = file_type_string(sb.st_mode);
+	printf("  File type:           %s", ftype);
+
+	if(S_ISLNK(sb.st_mode)) {
+		len = readlink(filename, link_target, sizeof(link_target) -1);
+		if (len != -1) {
+			link_target[len] = '\0';
+			printf(" -> %s", link_target);
+
+			if (stat(filename, &target_stat) == -1) {
+				printf(" - with dangling destination");
+			}
+		}
+		else {
+			printf(" -unreadable symlink");
+		}
+	}
+	printf("\n  Device ID number:     %ld\n", (long) sb.st_dev, (long) sb.st_dev);
+	printf("  I-node number:        %ld\n", (long) sb.st_ino);
+	print_permissions(sb.st_mode);
+	printf("  Link count:             %ld\n", (long) sb.st_nlink);
+
+	pw = getpwuid(sb.st_uid);
+	gr = getgrgid(sb.st_gid);
+
+	printf("  Owner Id:        %s       (uid = %d)\n", pw ? pw->pw_name : "???", sb.st_uid);
+	printf("  Group Id:        %s         (GID = %d)\n", gr ? gr->gr_name : "???", sb.st_gid);
+
+	printf("  Preferred I/O block size: %ld bytes\n", (long) sb.st_blksize);
+	printf("  File size:                %ld bytes\n", (long) sb.st_size);
+	printf("  Blocks allocated:         %ld\n", (long) sb.st_blocks);
+
+	print_time("Last file access", sb.st_atime);
+	print_time("Last file modification", sb.st_mtime);
+	print_time("Last status change", sb.st_ctime);
+	printf("\n");
+
 }
 
 const char *file_type_string(mode_t mode) {
 
 	if (S_ISREG(mode)) return "regular file";
-	if (S_ISDIR(mode)) return "regular file";
-	if (S_ISLINK(mode)) return "regular file";
-	if (S_ISCHR(mode)) return "regular file";
-	if (S_ISBLK(mode)) return "regular file";
-	if (S_ISFIFO(mode)) return "regular file";
-	if (S_ISSOCK(mode)) return "regular file";
+	if (S_ISDIR(mode)) return "directory";
+	if (S_ISLNK(mode)) return "Symbolic link";
+	if (S_ISCHR(mode)) return "character device";
+	if (S_ISBLK(mode)) return "block device";
+	if (S_ISFIFO(mode)) return "FIFO/pipe";
+	if (S_ISSOCK(mode)) return "socket";
 	return "unknown";
 
 }
