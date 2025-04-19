@@ -17,6 +17,7 @@
 
 int main(int argc, char *argv[]) {
 
+	//set default key pointer and length
 	char *key = DEFAULT_KEY;
 	size_t key_len = strlen(key);
 
@@ -27,6 +28,7 @@ int main(int argc, char *argv[]) {
 
 	while((opt = getopt(argc, argv, OPTIONS)) != -1) {
 		switch (opt) {
+			//if using given argument key
 			case 'k':
 				fprintf(stderr, "\ncase k");
 				if(optarg == NULL || strlen(optarg) == 0) {
@@ -43,19 +45,20 @@ int main(int argc, char *argv[]) {
 	}
 	
 
-
+	//Keep reading bytes if read allows
 	while((bytes_read = read(STDIN_FILENO, buffer, BUF_SIZE)) > 0) {
+		//keep xoring until EOF
 		for(ssize_t i = 0; i < bytes_read; i++) {
 			buffer[i] ^= key[key_index];
 			key_index = (key_index + 1) % key_len;
 		}
-
+		//exit if mismatch in writing bytes
 		if(write(STDOUT_FILENO, buffer, bytes_read) != bytes_read) {
 			perror("write");
 			exit(EXIT_FAILURE);
 		}
 	}
-
+	//if unable to read bytes, fail
 	if(bytes_read < 0) {
 		perror("read");
 		exit(EXIT_FAILURE);

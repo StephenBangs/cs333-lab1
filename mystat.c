@@ -23,7 +23,7 @@
 //handles permissions
 void print_permissions(mode_t mode);
 //handles time (hopefully)
-void print_time(const char *label, time_t time);
+void print_time(const char *label, time_t time, int time_type);
 //returns file type char
 const char *file_type_string(mode_t mode);
 //handles printing file info
@@ -31,6 +31,10 @@ void print_file_info(const char *filename);
 
 int main(int argc, char *argv[]) {
 	
+	//testing why my local time zone is not working properly
+	time_t now = time(NULL);
+	fprintf(stderr, "System local time: %s", asctime(localtime(&now)));
+
 	//TODO - remove
 	for(int i = 1; i < argc; i++) {
 		fprintf(stderr, "Arg %d: %s\n", i, argv[i]);
@@ -79,23 +83,34 @@ void print_permissions(mode_t mode) {
 	if(mode & S_IXOTH) perms[9] = 'x';
 	
 	//print em all up
-	printf("  Mode:                 %s       (%o in octal)\n", perms, mode & 0777);
+	printf("  Mode:                     %s        (%o in octal)\n", perms, mode & 0777);
 }
 
 
-void print_time(const char *label, time_t t) {
+void print_time(const char *label, time_t t, int time_type) {
 	char local_buf[64];
 	char gmt_buf[64];
 
 	struct tm *local = localtime(&t);
 	struct tm *gmt = gmtime(&t);
 	
-	strftime(local_buf, sizeof(local_buf), "%Y-%m-%d %H:%M:%S %z (%Z) %a", local);
-	strftime(gmt_buf, sizeof(gmt_buf), "%Y-%m-%d %H:%M:%S %z (%Z) %a", gmt);
+	switch(time_type) {
+		case 0:
+			printf("  %s:   %ld (seconds since the epoch)\n", label, t);
+			break;
+		case 1:
 
-	printf("  %s:    %ld (seconds since the epoch)\n", label, t);
-	printf("  %s:    %s (local)\n", label, local_buf);
-	printf("  %s:    %s (GMT)\n", label, gmt_buf);
+			strftime(local_buf, sizeof(local_buf), "%Y-%m-%d %H:%M:%S %z (%Z) %a", local);
+			printf("  %s:       %s (local)\n", label, local_buf);
+			break;
+		case 2:
+			strftime(gmt_buf, sizeof(gmt_buf), "%Y-%m-%d %H:%M:%S %z (%Z) %a", gmt);
+			printf("  %s:       %s (GMT)\n", label, gmt_buf);
+			break;
+		default:
+			fprintf(stderr, "Error: no case for print_time\n");
+			break;
+	}
 
 }
 
@@ -119,7 +134,7 @@ void print_file_info(const char *filename) {
 	printf("File: %s\n", filename);
 
 	ftype = file_type_string(sb.st_mode);
-	printf("  File type:           %s", ftype);
+	printf("  File type:                %s", ftype);
 
 	if(S_ISLNK(sb.st_mode)) {
 		len = readlink(filename, link_target, sizeof(link_target) -1);
@@ -135,24 +150,32 @@ void print_file_info(const char *filename) {
 			printf(" -unreadable symlink");
 		}
 	}
-	printf("\n  Device ID number:     %ld\n", (long) sb.st_dev, (long) sb.st_dev);
-	printf("  I-node number:        %ld\n", (long) sb.st_ino);
+	printf("\n  Device ID number:         %ld\n", (long) sb.st_dev);
+	printf("  I-node number:            %ld\n", (long) sb.st_ino);
 	print_permissions(sb.st_mode);
-	printf("  Link count:             %ld\n", (long) sb.st_nlink);
+	printf("  Link count:               %ld\n", (long) sb.st_nlink);
 
 	pw = getpwuid(sb.st_uid);
 	gr = getgrgid(sb.st_gid);
 
-	printf("  Owner Id:        %s       (uid = %d)\n", pw ? pw->pw_name : "???", sb.st_uid);
-	printf("  Group Id:        %s         (GID = %d)\n", gr ? gr->gr_name : "???", sb.st_gid);
+	printf("  Owner Id:                 %s           (UID = %d)\n", pw ? pw->pw_name : "???", sb.st_uid);
+	printf("  Group Id:                 %s              (GID = %d)\n", gr ? gr->gr_name : "???", sb.st_gid);
 
 	printf("  Preferred I/O block size: %ld bytes\n", (long) sb.st_blksize);
 	printf("  File size:                %ld bytes\n", (long) sb.st_size);
 	printf("  Blocks allocated:         %ld\n", (long) sb.st_blocks);
 
-	print_time("Last file access", sb.st_atime);
-	print_time("Last file modification", sb.st_mtime);
-	print_time("Last status change", sb.st_ctime);
+	print_time("Last file access", sb.st_atime, 0);
+	print_time("Last file modification", sb.st_mtime, 0);
+	print_time("Last status change", sb.st_ctime, 0);
+
+	print_time("Last file access", sb.st_atime, 1);
+	print_time("Last file modification", sb.st_mtime, 1);
+	print_time("Last status change", sb.st_ctime, 1);
+
+	print_time("Last file access", sb.st_atime, 2);
+	print_time("Last file modification", sb.st_mtime, 2);
+	print_time("Last status change", sb.st_ctime, 2);
 	printf("\n");
 
 }
