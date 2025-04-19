@@ -23,7 +23,7 @@
 //handles permissions
 void print_permissions(mode_t mode);
 //handles time (hopefully)
-void print_time(const char *label, time_t time, int time_type);
+void print_time(const char *label, time_t t, time_t tlocal, int time_type);
 //returns file type char
 const char *file_type_string(mode_t mode);
 //handles printing file info
@@ -32,8 +32,11 @@ void print_file_info(const char *filename);
 int main(int argc, char *argv[]) {
 	
 	//testing why my local time zone is not working properly
-	time_t now = time(NULL);
-	fprintf(stderr, "System local time: %s", asctime(localtime(&now)));
+	//time_t now = time(NULL);
+	//fprintf(stderr, "System local time: %s", asctime(localtime(&now)));
+	//forcing environment variable to PDT
+	setenv("TZ", "/usr/share/zoneinfo/America/Los_Angeles", 1);
+	tzset(); 
 
 	//TODO - remove
 	for(int i = 1; i < argc; i++) {
@@ -86,24 +89,27 @@ void print_permissions(mode_t mode) {
 	printf("  Mode:                     %s        (%o in octal)\n", perms, mode & 0777);
 }
 
-
-void print_time(const char *label, time_t t, int time_type) {
+//prints time in various types based on time_type
+void print_time(const char *label, time_t t, time_t tlocal, int time_type) {
 	char local_buf[64];
 	char gmt_buf[64];
 
-	struct tm *local = localtime(&t);
-	struct tm *gmt = gmtime(&t);
-	
+	struct tm *local;
+	struct tm *gmt;
+	//struct tm tm_result;
+
+
 	switch(time_type) {
 		case 0:
-			printf("  %s:   %ld (seconds since the epoch)\n", label, t);
+			printf("  %-26s: %ld (seconds since the epoch)\n", label, t);
 			break;
 		case 1:
-
+			local = localtime(&tlocal);
 			strftime(local_buf, sizeof(local_buf), "%Y-%m-%d %H:%M:%S %z (%Z) %a", local);
 			printf("  %s:       %s (local)\n", label, local_buf);
 			break;
 		case 2:
+			gmt = gmtime(&t);
 			strftime(gmt_buf, sizeof(gmt_buf), "%Y-%m-%d %H:%M:%S %z (%Z) %a", gmt);
 			printf("  %s:       %s (GMT)\n", label, gmt_buf);
 			break;
@@ -114,8 +120,9 @@ void print_time(const char *label, time_t t, int time_type) {
 
 }
 
-
+//main printing function (messy)
 void print_file_info(const char *filename) {
+
 	
 	struct stat sb;
 	char link_target[PATH_MAX];
@@ -165,21 +172,22 @@ void print_file_info(const char *filename) {
 	printf("  File size:                %ld bytes\n", (long) sb.st_size);
 	printf("  Blocks allocated:         %ld\n", (long) sb.st_blocks);
 
-	print_time("Last file access", sb.st_atime, 0);
-	print_time("Last file modification", sb.st_mtime, 0);
-	print_time("Last status change", sb.st_ctime, 0);
+	print_time("Last file access", sb.st_atime, sb.st_atime, 0);
+	print_time("Last file modification", sb.st_mtime, sb.st_mtime, 0);
+	print_time("Last status change", sb.st_ctime, sb.st_ctime, 0);
 
-	print_time("Last file access", sb.st_atime, 1);
-	print_time("Last file modification", sb.st_mtime, 1);
-	print_time("Last status change", sb.st_ctime, 1);
+	print_time("Last file access", sb.st_atime, sb.st_atime, 1);
+	print_time("Last file modification", sb.st_mtime, sb.st_mtime, 1);
+	print_time("Last status change", sb.st_ctime, sb.st_ctime, 1);
 
-	print_time("Last file access", sb.st_atime, 2);
-	print_time("Last file modification", sb.st_mtime, 2);
-	print_time("Last status change", sb.st_ctime, 2);
+	print_time("Last file access", sb.st_atime, sb.st_atime, 2);
+	print_time("Last file modification", sb.st_mtime, sb.st_mtime, 2);
+	print_time("Last status change", sb.st_ctime, sb.st_ctime, 2);
 	printf("\n");
 
 }
 
+//returns what kind of file as a string for display
 const char *file_type_string(mode_t mode) {
 
 	if (S_ISREG(mode)) return "regular file";
